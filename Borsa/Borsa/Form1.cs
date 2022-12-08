@@ -34,6 +34,11 @@ namespace Borsa
         }
         string user = System.Environment.UserName;
         bool lastRecordButtonControl = false;
+        public bool mauseClick = false;
+
+        public int clickedRow;
+        public int unClickedRow;
+
         public class Item
         {
             public int row;
@@ -194,6 +199,9 @@ namespace Borsa
                     {
                         dataGridView1.Rows[i].DefaultCellStyle.BackColor = Color.IndianRed;
                         dataGridView1.Rows[i].Cells[7].Style.BackColor = Color.White;
+                    } else
+                    {
+                        dataGridView1.Rows[i].DefaultCellStyle.BackColor = Color.White;
                     }
                 }
 
@@ -270,6 +278,7 @@ namespace Borsa
                 {
                     if (!Char.IsNumber(chr)) return false;
                 }
+                return true;
             }
             return true;
         }
@@ -314,7 +323,7 @@ namespace Borsa
 
                 if (maliyetTutari.Value.ToString() != "" && adet.Value.ToString() != "")
                 {
-                    if (numberControl(maliyetTutari.ToString()) && numberControl(adet.Value.ToString()))
+                    if (numberControl(maliyetTutari.Value.ToString()) && numberControl(adet.Value.ToString()))
                     {
                         var fixMaliyetTutari = maliyetTutari.Value.ToString().Replace("-", "");
                         maliyet.Value = Math.Round(Convert.ToDouble(fixMaliyetTutari) / Convert.ToDouble(adet.Value), 2).ToString();
@@ -390,6 +399,7 @@ namespace Borsa
         {
             saveJson();
             listBoxReload();
+            errorMessage("Kayıt edildi", 1000);
         }
 
 
@@ -417,6 +427,66 @@ namespace Borsa
             string filePath = "C:\\Users\\" + user + "\\Documents\\borsa\\dat\\list.json";
             if(File.Exists(filePath)) showLogFile(filePath);
 
+        }
+
+        /*
+        private void button8_Click(object sender, EventArgs e)
+        {
+            Process.Start("cmd.exe", "/k" + "cd C:\\borsaApp&git checkout main&git reset --hard").Close();
+            Process.Start("cmd.exe", "/k" + "cd C:\\borsaApp&git pull").Close();
+
+            Form1 form = new Form1();
+            form.Close();
+            Application.ExitThread();
+            Application.Exit();
+
+            Process.Start("cmd.exe", "/k" + "start C:\\borsaApp\\setup.exe").Close();
+
+        }
+        */
+
+        private void dataGridView1_CellMouseUp(object sender, DataGridViewCellMouseEventArgs e)
+        {
+
+            if (mauseClick)
+            {
+                mauseClick = false;
+                unClickedRow = e.RowIndex;
+               // label6.Text = "İlk tıklanan satır: " + clickedRow + " Son tıklanan satır: " + unClickedRow;
+
+                var selectedRow = dataGridView1.Rows[clickedRow];
+                var changedRow = dataGridView1.Rows[unClickedRow];
+
+                if(dataGridView1.Rows.Count - 1 == selectedRow.Index || dataGridView1.Rows.Count - 1 == changedRow.Index)
+                {
+                    errorMessage("Hatalı tıklama", 1000);
+                    return;
+                }
+                //MessageBox.Show((dataGridView1.Rows.Count - 1).ToString() + " " + selectedRow.Index);
+
+                if (selectedRow.Cells[0].Value != null && changedRow.Cells[0].Value != null)
+                {
+                    var menkul = dataGridView1.Rows[clickedRow].Cells[0].Value.ToString();
+                    var adet = dataGridView1.Rows[clickedRow].Cells[1].Value.ToString();
+                    var maliyet = dataGridView1.Rows[clickedRow].Cells[2].Value.ToString();
+                    var maliyetTutari = dataGridView1.Rows[clickedRow].Cells[3].Value.ToString();
+                    var sonfiyat = dataGridView1.Rows[clickedRow].Cells[4].Value.ToString();
+                    var piyasaTutari = dataGridView1.Rows[clickedRow].Cells[6].Value.ToString();
+                    var kz = dataGridView1.Rows[clickedRow].Cells[7].Value.ToString();
+                   // MessageBox.Show(changedRow.Cells[7].Value.ToString());
+                    selectedRow.SetValues(changedRow.Cells[0].Value, changedRow.Cells[1].Value, changedRow.Cells[2].Value, changedRow.Cells[3].Value, changedRow.Cells[4].Value, " ",changedRow.Cells[6].Value, changedRow.Cells[7].Value);
+
+                    changedRow.SetValues(menkul, adet, maliyet, maliyetTutari, sonfiyat, " ", piyasaTutari, kz);
+                    colorizedGrid();
+
+                }
+            }
+
+        }
+
+        private void dataGridView1_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            if (!mauseClick) mauseClick = true; clickedRow = e.RowIndex;
         }
     }
 }
