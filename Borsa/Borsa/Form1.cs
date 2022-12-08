@@ -21,6 +21,7 @@ using System.Text.RegularExpressions;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 using System.ComponentModel.Design;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using System.Linq.Expressions;
 
 namespace Borsa
 {
@@ -54,6 +55,7 @@ namespace Borsa
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            s.files();
             DataTable tablo = new DataTable();
             tablo.Columns.Add("Menkul", typeof(string));
             tablo.Columns.Add("Adet", typeof(string));
@@ -76,7 +78,7 @@ namespace Borsa
             string filePath = file == "list" ? "C:\\Users\\" + user + "\\Documents\\borsa\\\\dat\\list.json" : "C:\\Users\\" + user + "\\Documents\\borsa\\dat\\lastRecordDat\\" + file + ".json";
             if (file == "list") label5.Visible = false; else label5.Visible = true;
             //MessageBox.Show(filePath);
-        
+
             if (File.Exists(filePath))
             {
                 using (StreamReader r = new StreamReader(filePath))
@@ -114,11 +116,12 @@ namespace Borsa
                         }
                     }
                 }
-            } else
+            }
+            else
             {
                 errorMessage("Böyle bir kayıt bulunamadı.", 2000);
             }
-            
+
             karZararHesapla(true);
             colorizedGrid();
         }
@@ -129,8 +132,8 @@ namespace Borsa
             string tarih = DateTime.Now.ToString("dd.MM.yyyy");
             string saat = DateTime.Now.ToString("H:mm:ss").Replace(":", ",");
 
-            string filePath = "C:\\Users\\"+user+"\\Documents\\borsa\\dat\\list.json";
-            string destinationFile = "C:\\Users\\"+user+"\\Documents\\borsa\\dat\\lastRecordDat\\" + tarih + " - " + saat + " lastRecord.json";
+            string filePath = "C:\\Users\\" + user + "\\Documents\\borsa\\dat\\list.json";
+            string destinationFile = "C:\\Users\\" + user + "\\Documents\\borsa\\dat\\lastRecordDat\\" + tarih + " - " + saat + " lastRecord.json";
             //MessageBox.Show(destinationFile);
             if (File.Exists(filePath))
             {
@@ -191,7 +194,7 @@ namespace Borsa
 
         public void colorizedGrid()
         {
-            for(int i = 0; i < dataGridView1.RowCount; i++)
+            for (int i = 0; i < dataGridView1.RowCount; i++)
             {
                 if (dataGridView1.Rows[i].Cells[0].Value != null && dataGridView1.Rows[i].Cells[0].Value.ToString() != "")
                 {
@@ -199,7 +202,8 @@ namespace Borsa
                     {
                         dataGridView1.Rows[i].DefaultCellStyle.BackColor = Color.IndianRed;
                         dataGridView1.Rows[i].Cells[7].Style.BackColor = Color.White;
-                    } else
+                    }
+                    else
                     {
                         dataGridView1.Rows[i].DefaultCellStyle.BackColor = Color.White;
                     }
@@ -207,10 +211,11 @@ namespace Borsa
 
                 if (dataGridView1.Rows[i].Cells[7].Value != null && dataGridView1.Rows[i].Cells[7].Value.ToString() != "")
                 {
-                    if(dataGridView1.Rows[i].Cells[7].Value.ToString().Contains("-"))
+                    if (dataGridView1.Rows[i].Cells[7].Value.ToString().Contains("-"))
                     {
                         dataGridView1.Rows[i].Cells[7].Style.ForeColor = Color.Red;
-                    } else
+                    }
+                    else
                     {
                         dataGridView1.Rows[i].Cells[7].Style.ForeColor = Color.Green;
                     }
@@ -220,7 +225,7 @@ namespace Borsa
 
         private void karZararHesapla(bool s)
         {
-            
+
             double karZarar = Convert.ToDouble(label2.Text);
             double toplam = 0.0;
             for (int i = 0; i < dataGridView1.Rows.Count; ++i)
@@ -250,7 +255,7 @@ namespace Borsa
                         label3.ForeColor = Color.Green;
                     }
                 }
-            } 
+            }
 
             label2.Text = toplam.ToString();
         }
@@ -258,13 +263,13 @@ namespace Borsa
         private void listBoxReload()
         {
             listBox1.Items.Clear();
-            string path = "C:\\Users\\"+user+"\\Documents\\borsa\\dat\\lastRecordDat";
+            string path = "C:\\Users\\" + user + "\\Documents\\borsa\\dat\\lastRecordDat";
 
             string[] files = System.IO.Directory.GetFiles(path);
 
             for (int j = files.Length; j > 0; j--)
             {
-                string file = files[j-1];          
+                string file = files[j - 1];
                 listBox1.Items.Add(file.Split('\\').Last().Replace("lastRecord.json", ""));
             }
 
@@ -297,7 +302,7 @@ namespace Borsa
 
         private void dataGridView1_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
-           
+
             var menkul = dataGridView1.CurrentRow.Cells[0];
             var adet = dataGridView1.CurrentRow.Cells[1];
             var maliyet = dataGridView1.CurrentRow.Cells[2];
@@ -309,16 +314,18 @@ namespace Borsa
             if (menkul.Value.ToString().Contains("-") != true)
             {
                 dataGridView1.CurrentRow.DefaultCellStyle.BackColor = Color.White;
-              
+
                 if (adet.Value.ToString() != "" && sonfiyat.Value.ToString() != "")
                 {
-                    if(numberControl(adet.Value.ToString()) && numberControl(sonfiyat.Value.ToString())) {
+                    if (numberControl(adet.Value.ToString()) && numberControl(sonfiyat.Value.ToString()))
+                    {
                         piyasaTutari.Value = (Convert.ToDouble(adet.Value) * Convert.ToDouble(sonfiyat.Value)).ToString();
-                    } else
+                    }
+                    else
                     {
                         errorMessage("Adet veya son fiyat desteklenmeyen karakter içeriyor.", 2000);
                     }
-                    
+
                 }
 
                 if (maliyetTutari.Value.ToString() != "" && adet.Value.ToString() != "")
@@ -327,7 +334,8 @@ namespace Borsa
                     {
                         var fixMaliyetTutari = maliyetTutari.Value.ToString().Replace("-", "");
                         maliyet.Value = Math.Round(Convert.ToDouble(fixMaliyetTutari) / Convert.ToDouble(adet.Value), 2).ToString();
-                    } else
+                    }
+                    else
                     {
                         errorMessage("Adet veya maliyet desteklenmeyen karakter içeriyor.", 2000);
                     }
@@ -347,12 +355,14 @@ namespace Borsa
                         {
                             kz.Style.ForeColor = Color.Green;
                         }
-                    } else
+                    }
+                    else
                     {
                         errorMessage("Piyasa tutarı veya maliyet tutarı desteklenmeyen karakter içeriyor.", 2000);
                     }
                 }
-            } else
+            }
+            else
             {
                 dataGridView1.CurrentRow.DefaultCellStyle.BackColor = Color.IndianRed;
                 dataGridView1.CurrentRow.Cells[7].Style.BackColor = Color.White;
@@ -366,12 +376,17 @@ namespace Borsa
             {
                 lastRecordButtonControl = true;
                 dataGridView1.Location = new Point(12, 63);
-                dataGridView1.Size = new Size(660, 495);
+                dataGridView1.Size = new Size(596, 495);
                 listBox1.Visible = true;
                 panel3.Visible = true;
+                button8.Visible = true;
+                button9.Visible = true;
                 listBoxReload();
-            } else
+            }
+            else
             {
+                button8.Visible = false;
+                button9.Visible = false;
                 panel3.Visible = false;
                 lastRecordButtonControl = false;
                 dataGridView1.Size = new Size(839, 495);
@@ -384,7 +399,8 @@ namespace Borsa
             if (listBox1.SelectedIndex != -1)
             {
                 LoadJson(listBox1.SelectedItem.ToString() + "lastRecord");
-            } else
+            }
+            else
             {
                 errorMessage("Önce görmek istediğiniz kayıtı seçiniz.", 1500);
             }
@@ -419,32 +435,15 @@ namespace Borsa
         {
             string filePath = "C:\\Users\\" + user + "\\Documents\\borsa\\dat\\lastRecordDat\\" + listBox1.SelectedItem.ToString() + "lastRecord.json";
             if (listBox1.SelectedIndex != -1) showLogFile(filePath); else errorMessage("Lütfen görüntülemek istediğiniz kayıtı seçiniz.", 2000);
-            
+
         }
 
         private void button4_Click(object sender, EventArgs e)
         {
             string filePath = "C:\\Users\\" + user + "\\Documents\\borsa\\dat\\list.json";
-            if(File.Exists(filePath)) showLogFile(filePath);
+            if (File.Exists(filePath)) showLogFile(filePath);
 
         }
-
-        /*
-        private void button8_Click(object sender, EventArgs e)
-        {
-            Process.Start("cmd.exe", "/k" + "cd C:\\borsaApp&git checkout main&git reset --hard").Close();
-            Process.Start("cmd.exe", "/k" + "cd C:\\borsaApp&git pull").Close();
-
-            Form1 form = new Form1();
-            form.Close();
-            Application.ExitThread();
-            Application.Exit();
-
-            Process.Start("cmd.exe", "/k" + "start C:\\borsaApp\\setup.exe").Close();
-
-        }
-        */
-
         private void dataGridView1_CellMouseUp(object sender, DataGridViewCellMouseEventArgs e)
         {
 
@@ -452,17 +451,15 @@ namespace Borsa
             {
                 mauseClick = false;
                 unClickedRow = e.RowIndex;
-               // label6.Text = "İlk tıklanan satır: " + clickedRow + " Son tıklanan satır: " + unClickedRow;
-
+                
                 var selectedRow = dataGridView1.Rows[clickedRow];
                 var changedRow = dataGridView1.Rows[unClickedRow];
 
-                if(dataGridView1.Rows.Count - 1 == selectedRow.Index || dataGridView1.Rows.Count - 1 == changedRow.Index)
+                if (dataGridView1.Rows.Count - 1 == selectedRow.Index || dataGridView1.Rows.Count - 1 == changedRow.Index)
                 {
                     errorMessage("Hatalı tıklama", 1000);
                     return;
                 }
-                //MessageBox.Show((dataGridView1.Rows.Count - 1).ToString() + " " + selectedRow.Index);
 
                 if (selectedRow.Cells[0].Value != null && changedRow.Cells[0].Value != null)
                 {
@@ -473,12 +470,12 @@ namespace Borsa
                     var sonfiyat = dataGridView1.Rows[clickedRow].Cells[4].Value.ToString();
                     var piyasaTutari = dataGridView1.Rows[clickedRow].Cells[6].Value.ToString();
                     var kz = dataGridView1.Rows[clickedRow].Cells[7].Value.ToString();
-                   // MessageBox.Show(changedRow.Cells[7].Value.ToString());
-                    selectedRow.SetValues(changedRow.Cells[0].Value, changedRow.Cells[1].Value, changedRow.Cells[2].Value, changedRow.Cells[3].Value, changedRow.Cells[4].Value, " ",changedRow.Cells[6].Value, changedRow.Cells[7].Value);
+
+                    selectedRow.SetValues(changedRow.Cells[0].Value, changedRow.Cells[1].Value, changedRow.Cells[2].Value, changedRow.Cells[3].Value, changedRow.Cells[4].Value, " ", changedRow.Cells[6].Value, changedRow.Cells[7].Value);
 
                     changedRow.SetValues(menkul, adet, maliyet, maliyetTutari, sonfiyat, " ", piyasaTutari, kz);
                     colorizedGrid();
-
+                    label6.Text = ("Son tıklanan row: " + unClickedRow.ToString() + " İlk tıklanan row: " + clickedRow.ToString());
                 }
             }
 
@@ -486,7 +483,8 @@ namespace Borsa
 
         private void dataGridView1_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
         {
-            if (!mauseClick) mauseClick = true; clickedRow = e.RowIndex;
+            if (!mauseClick) { mauseClick = true; clickedRow = e.RowIndex; }
         }
+
     }
 }

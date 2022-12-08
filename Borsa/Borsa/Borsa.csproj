@@ -52,7 +52,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>530DF10EA4437D652D67D53EE23408AC6CAE098D</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>2F50BEC673C2EC817660C5F9F9D3614D06379D2D</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
     <ManifestKeyFile>Borsa_TemporaryKey.pfx</ManifestKeyFile>
@@ -83,6 +83,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Files.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
