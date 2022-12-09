@@ -16,16 +16,20 @@ namespace Borsa
     {
         public static void files()
         {
+            Form1 form = new Form1();
+
             string user = System.Environment.UserName;
             String[] directorys = {
                 "borsa",
                 "borsa\\dat",
-                "borsa\\dat\\lastRecordDat"
+                "borsa\\logs",
+                "borsa\\dat\\lastRecordDat"     
             };
 
             String[] files =
             {
-                "borsa\\options.json"
+                "borsa\\options.json",
+                "borsa\\userOptions.json"
             };
 
             foreach(string directory in directorys)
@@ -34,6 +38,8 @@ namespace Borsa
                 if (Directory.Exists(directoryLoc) == false)
                 {
                     Directory.CreateDirectory(directoryLoc);
+                    
+                    form.WriteLog("Eksik klasör oluşturuldu " + directoryLoc);
                 } 
             }
 
@@ -44,13 +50,18 @@ namespace Borsa
                 {
                     FileStream fs = new FileStream(fileLoc, FileMode.OpenOrCreate, FileAccess.Write);
                     StreamWriter sw = new StreamWriter(fs);
-                    string veri = String.Format(@"[
-    {{
-        ""ayar1"": ""secenek"",
-        ""ayar2"": ""secenek""
-    }}
-]"
-);
+                    string veri = "";
+                    if (file == "borsa\\options.json")
+                    {
+                        
+                         veri = String.Format(@"[{{""ayar1"": ""0"",""ayar2"": ""secenek""}}]");
+
+
+                    } else if (file.Contains("userOptions.json"))
+                    {
+                        veri = (@"[{""balance"": ""0""}]");
+                    }
+                    form.WriteLog("Eksik dosya oluşturuldu " + fileLoc);
                     sw.WriteLine(veri);
                     sw.Flush();
                     sw.Close();
